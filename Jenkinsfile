@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git url: 'https://github.com/NAV2003een/Bus-Reservation-Syatem.git'
+               git branch: 'main', url: 'https://github.com/NAV2003een/Bus-Reservation-Syatem.git'
             }
         }
 
