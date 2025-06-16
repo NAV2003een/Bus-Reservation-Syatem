@@ -8,29 +8,12 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build and Start Containers') {
             steps {
-                script {
-                    dockerImage = docker.build('bus-reservation-system-web')
-                }
+                sh 'docker-compose down || true'
+                sh 'docker-compose build'
+                sh 'docker-compose up -d'
             }
-        }
-
-        stage('Run Docker Container') {
-            steps {
-                script {
-                    dockerImage.run('-d -p 8000:8000')
-                }
-            }
-        }
-    }
-
-    post {
-        failure {
-            echo '❌ Build failed.'
-        }
-        success {
-            echo '✅ Build and deployment successful!'
         }
     }
 }
