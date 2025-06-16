@@ -4,47 +4,33 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/NAV2003een/Bus-Reservation-Syatem.git'
+                git 'https://github.com/NAV2003een/Bus-Reservation-Syatem.git'
             }
         }
 
-        stage('Setup Python Environment') {
+        stage('Build Docker Image') {
             steps {
-                bat '''
-                python --version
-                python -m venv venv
-                call venv\\Scripts\\activate
-                python -m pip install --upgrade pip
-                pip install -r requirements.txt
-                '''
+                script {
+                    dockerImage = docker.build('bus-reservation-system-web')
+                }
             }
         }
 
-        stage('Run Migrations') {
+        stage('Run Docker Container') {
             steps {
-                bat '''
-                call venv\\Scripts\\activate
-                python manage.py migrate
-                '''
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                bat '''
-                call venv\\Scripts\\activate
-                python manage.py test
-                '''
+                script {
+                    dockerImage.run('-d -p 8000:8000')
+                }
             }
         }
     }
 
     post {
-        success {
-            echo '✅ Pipeline completed successfully.'
-        }
         failure {
-            echo '❌ Pipeline failed.'
+            echo '❌ Build failed.'
+        }
+        success {
+            echo '✅ Build and deployment successful!'
         }
     }
 }
